@@ -2,10 +2,12 @@ package es.redflag.katas.marsrover;
 
 public class Rover {
 
-    private Compass compass;
+    private Compass compass             = new Compass();
+    private CommandFactory cmdFactory   = new CommandFactory();
 
     public Rover(){
-        compass= new Compass();
+        cmdFactory.register('L', new Left());
+        cmdFactory.register('R', new Right());
     }
 
     public String orientation() {
@@ -19,64 +21,6 @@ public class Rover {
     }
 
     private void executeCommand(char command) {
-        String myCommand = String.valueOf(command);
-        if (myCommand.equals("L")) turnLeft();
-        if (myCommand.equals("R")) turnRight();
-    }
-
-    private void turnRight() {
-        String orientation = compass.orientation();
-        switch (orientation){
-            case "N":
-                compass.changeDirection("E");
-                return;
-            case "E":
-                compass.changeDirection("S");
-                return;
-            case "S":
-                compass.changeDirection("W");
-                return;
-            case "W":
-                compass.changeDirection("N");
-                return;
-            default:
-                return;
-        }
-    }
-
-    private void turnLeft() {
-        String orientation = compass.orientation();
-        switch (orientation){
-            case "N":
-                compass.changeDirection("W");
-                return;
-            case "E":
-                compass.changeDirection("N");
-                return;
-            case "S":
-                compass.changeDirection("E");
-                return;
-            case "W":
-                compass.changeDirection("S");
-                return;
-            default:
-                return;
-        }
-    }
-
-    private class Compass{
-        private String facing;
-
-        public Compass(){
-            facing = "N";
-        }
-
-        public void changeDirection(String orientation){
-            facing = orientation;
-        }
-
-        public String orientation(){
-            return facing;
-        }
+        cmdFactory.get(command).ifPresent(cmd -> cmd.setNewDirection(compass));
     }
 }
